@@ -38,6 +38,7 @@ ex_help(exarg_T *eap)
 #ifdef FEAT_FOLDING
     int		old_KeyTyped = KeyTyped;
 #endif
+    int		ecmd_flags = ECMD_HIDE;
 
     if (ERROR_IF_ANY_POPUP_WINDOW)
 	return;
@@ -154,15 +155,23 @@ ex_help(exarg_T *eap)
 	    if (win_split(0, n) == FAIL)
 		goto erret;
 
-	    if (curwin->w_height < p_hh)
-		win_setheight((int)p_hh);
+	    if (cmdmod.cmod_curwin == 0)
+	    {
+		if (curwin->w_height < p_hh)
+		    win_setheight((int)p_hh);
+	    }
+	    else
+	    {
+		if (cmdmod.cmod_curwin_force)
+		    ecmd_flags = ECMD_FORCEIT;
+	    }
 
 	    // Open help file (do_ecmd() will set b_help flag, readfile() will
 	    // set b_p_ro flag).
 	    // Set the alternate file to the previously edited file.
 	    alt_fnum = curbuf->b_fnum;
 	    (void)do_ecmd(0, NULL, NULL, NULL, ECMD_LASTL,
-			  ECMD_HIDE + ECMD_SET_HELP,
+			  ecmd_flags + ECMD_SET_HELP,
 			  NULL);  // buffer is still open, don't store info
 	    if ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 		curwin->w_alt_fnum = alt_fnum;

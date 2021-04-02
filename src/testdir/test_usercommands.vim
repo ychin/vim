@@ -28,6 +28,10 @@ function Test_cmdmods()
   call assert_equal('confirm', g:mods)
   conf MyCmd
   call assert_equal('confirm', g:mods)
+  curwin MyCmd
+  call assert_equal('curwin', g:mods)
+  cur MyCmd
+  call assert_equal('curwin', g:mods)
   hide MyCmd
   call assert_equal('hide', g:mods)
   hid MyCmd
@@ -86,11 +90,11 @@ function Test_cmdmods()
   vert MyCmd
   call assert_equal('vertical', g:mods)
 
-  aboveleft belowright botright browse confirm hide keepalt keepjumps
+  aboveleft belowright botright browse confirm curwin hide keepalt keepjumps
 	      \ keepmarks keeppatterns lockmarks noswapfile silent tab
 	      \ topleft verbose vertical MyCmd
 
-  call assert_equal('browse confirm hide keepalt keepjumps ' .
+  call assert_equal('browse confirm curwin hide keepalt keepjumps ' .
       \ 'keepmarks keeppatterns lockmarks noswapfile silent ' .
       \ 'verbose aboveleft belowright botright tab topleft vertical', g:mods)
 

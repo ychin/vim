@@ -646,6 +646,8 @@ typedef struct
 #define CMOD_NOSWAPFILE	    0x2000	// ":noswapfile"
 #define CMOD_VIM9CMD	    0x4000	// ":vim9cmd"
 
+    int		cmod_curwin;		// > 0 when ":curwin" was used
+    int		cmod_curwin_force;	// set for :curwin!
     int		cmod_split;		// flags for win_split()
     int		cmod_tab;		// > 0 when ":tab" was used
     regmatch_T	cmod_filter_regmatch;	// set by :filter /pat/

@@ -1262,6 +1262,10 @@ add_win_cmd_modifers(char_u *buf, cmdmod_T *cmod, int *multi_mods)
     // :vertical
     if (cmod->cmod_split & WSP_VERT)
 	result += add_cmd_modifier(buf, "vertical", multi_mods);
+
+    // :curwin
+    if (cmdmod.cmod_curwin > 0)
+	result += add_cmd_modifier(buf, "curwin", multi_mods);
     return result;
 }
 

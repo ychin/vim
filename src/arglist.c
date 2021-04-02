@@ -950,6 +950,10 @@ do_arg_all(
     need_mouse_correct = TRUE;
 # endif
 
+    // Don't use a current window, since the whole point of this command is to
+    // open multiple splits.
+    cmdmod.cmod_curwin = 0;
+
     // Try closing all windows that are not in the argument list.
     // Also close windows that are not full width;
     // When 'hidden' or "forceit" set the buffer becomes hidden.

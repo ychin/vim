@@ -2463,6 +2463,7 @@ do_one_cmd(
 	    case CMD_call:
 	    case CMD_confirm:
 	    case CMD_const:
+	    case CMD_curwin:
 	    case CMD_delfunction:
 	    case CMD_djump:
 	    case CMD_dlist:
@@ -2844,11 +2845,38 @@ parse_command_modifiers(
 			cmod->cmod_split |= WSP_BOT;
 			continue;
 
-	    case 'c':	if (!checkforcmd_opt(&eap->cmd, "confirm", 4, TRUE))
-			    break;
+	    case 'c':	if (checkforcmd_opt(&eap->cmd, "confirm", 4, TRUE))
+			{
 #if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
 			cmod->cmod_flags |= CMOD_CONFIRM;
 #endif
+			    continue;
+			}
+			if (!checkforcmd_noparen(&p, "curwin", 3))
+			    break;
+
+			{
+			    long winnr = get_address(eap, &eap->cmd, ADDR_WINDOWS,
+						     eap->skip, skip_only,
+						     FALSE, 1);
+			    if (winnr == MAXLNUM)
+				cmdmod.cmod_curwin = CURRENT_WIN_NR;
+			    else
+			    {
+				if (winnr <= 0 || winnr > LAST_WIN_NR)
+				{
+				    *errormsg = (e_invrange);
+				    return FAIL;
+				}
+				cmdmod.cmod_curwin = winnr;
+			    }
+			    if (*p == '!')
+			    {
+				cmdmod.cmod_curwin_force = TRUE;
+				p = skipwhite(p + 1);
+			    }
+			    eap->cmd = p;
+			}
 			continue;
 
 	    case 'k':	if (checkforcmd_noparen(&eap->cmd, "keepmarks", 3))
@@ -3665,6 +3693,7 @@ static struct cmdmod
     {"botright", 2, FALSE},
     {"browse", 3, FALSE},
     {"confirm", 4, FALSE},
+    {"curwin", 3, TRUE},
     {"filter", 4, FALSE},
     {"hide", 3, FALSE},
     {"keepalt", 5, FALSE},
@@ -6427,7 +6456,8 @@ ex_splitview(exarg_T *eap)
 	    RESET_BINDING(curwin);
 	else
 	    do_check_scrollbind(FALSE);
-	do_exedit(eap, old_curwin);
+
+	do_exedit(eap, (old_curwin == curwin) ? NULL : old_curwin);
     }
 
 # ifdef FEAT_BROWSE
@@ -6775,7 +6805,8 @@ do_exedit(
 	}
     }
 
-    if ((eap->cmdidx == CMD_new
+    if (!cmdmod.cmod_curwin
+	&& (eap->cmdidx == CMD_new
 		|| eap->cmdidx == CMD_tabnew
 		|| eap->cmdidx == CMD_tabedit
 		|| eap->cmdidx == CMD_vnew) && *eap->arg == NUL)
@@ -6813,7 +6844,7 @@ do_exedit(
 				      && vim_strchr(p_cpo, CPO_GOTO1) != NULL)
 					       ? ECMD_ONE : eap->do_ecmd_lnum,
 		    (buf_hide(curbuf) ? ECMD_HIDE : 0)
-		    + (eap->forceit ? ECMD_FORCEIT : 0)
+		    + (eap->forceit || (cmdmod.cmod_curwin && cmdmod.cmod_curwin_force) ? ECMD_FORCEIT : 0)
 		      // after a split we can use an existing buffer
 		    + (old_curwin != NULL ? ECMD_OLDBUF : 0)
 		    + (eap->cmdidx == CMD_badd ? ECMD_ADDBUF : 0)

@@ -436,11 +436,13 @@ term_start(
 {
     exarg_T	split_ea;
     win_T	*old_curwin = curwin;
+    win_T	*wp_curwin = NULL;
     term_T	*term;
     buf_T	*old_curbuf = NULL;
     int		res;
     buf_T	*newbuf;
     int		vertical = opt->jo_vertical || (cmdmod.cmod_split & WSP_VERT);
+    int		use_cur_win = opt->jo_curwin || cmdmod.cmod_curwin;
     jobopt_T	orig_opt;  // only partly filled
 
     if (check_restricted() || check_secure())
@@ -474,10 +476,27 @@ term_start(
     ga_init2(&term->tl_osc_buf, sizeof(char), 300);
 
     CLEAR_FIELD(split_ea);
-    if (opt->jo_curwin)
+    if (use_cur_win)
     {
+	if (cmdmod.cmod_curwin > 0)
+	{
+	    int i;
+	    wp_curwin = firstwin;
+	    for (i = 1; i < cmdmod.cmod_curwin; ++i)
+	    {
+		if (wp_curwin->w_next == NULL)
+		    break;
+		else
+		    wp_curwin = wp_curwin->w_next;
+	    }
+	    if (curwin != wp_curwin)
+	    {
+		win_goto(wp_curwin);
+	    }
+	}
+
 	// Create a new buffer in the current window.
-	if (!can_abandon(curbuf, flags & TERM_START_FORCEIT))
+	if (!can_abandon(curbuf, (flags & TERM_START_FORCEIT) || cmdmod.cmod_curwin_force))
 	{
 	    no_write_message();
 	    vim_free(term);
@@ -545,9 +564,9 @@ term_start(
     {
 	// Only one size was taken care of with :new, do the other one.  With
 	// "curwin" both need to be done.
-	if (opt->jo_term_rows > 0 && (opt->jo_curwin || vertical))
+	if (opt->jo_term_rows > 0 && (use_cur_win || vertical))
 	    win_setheight(opt->jo_term_rows);
-	if (opt->jo_term_cols > 0 && (opt->jo_curwin || !vertical))
+	if (opt->jo_term_cols > 0 && (use_cur_win || !vertical))
 	    win_setwidth(opt->jo_term_cols);
     }
 

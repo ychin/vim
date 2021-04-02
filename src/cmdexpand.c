@@ -1347,6 +1347,7 @@ set_one_cmd_context(
 	case CMD_cdo:
 	case CMD_cfdo:
 	case CMD_confirm:
+	case CMD_curwin:
 	case CMD_debug:
 	case CMD_folddoclosed:
 	case CMD_folddoopen:
