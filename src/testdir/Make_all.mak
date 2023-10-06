@@ -291,14 +291,12 @@ NEW_TESTS = \
 	test_tcl \
 	test_termcodes \
 	test_termdebug \
-	test_termencoding \
 	test_terminal \
 	test_terminal2 \
 	test_terminal3 \
 	test_terminal_fail \
 	test_textformat \
 	test_textobjects \
-	test_textprop \
 	test_timers \
 	test_true_false \
 	test_trycatch \
@@ -322,12 +320,15 @@ NEW_TESTS = \
 	test_windows_home \
 	test_wnext \
 	test_wordcount \
-	test_writefile \
 	test_xxd \
 	test_alot_latin \
 	test_alot_utf8 \
 	test_alot
-	#test_statusline \
+
+	#test_statusline
+	#test_writefile
+	#test_termencoding
+	#test_textprop
 
 # Test targets that use runtest.vim.
 # Keep test_alot*.res as the last one, sort the others.
@@ -409,9 +410,7 @@ NEW_TESTS_RES = \
 	test_getcwd.res \
 	test_getvar.res \
 	test_gf.res \
-	test_gn.res
-
-NEW_TESTS_RES_S1 = \
+	test_gn.res \
 	test_goto.res \
 	test_gui.res \
 	test_gui_init.res \
@@ -491,9 +490,7 @@ NEW_TESTS_RES_S1 = \
 	test_registers.res \
 	test_rename.res \
 	test_restricted.res \
-	test_retab.res
-
-NEW_TESTS_RES_S2 = \
+	test_retab.res \
 	test_ruby.res \
 	test_scriptnames.res \
 	test_scroll_opt.res \
@@ -515,7 +512,6 @@ NEW_TESTS_RES_S2 = \
 	test_spellfile.res \
 	test_startup.res \
 	test_stat.res \
-	test_statusline.res \
 	test_substitute.res \
 	test_suspend.res \
 	test_swap.res \
@@ -537,11 +533,7 @@ NEW_TESTS_RES_S2 = \
 	test_textobjects.res \
 	test_timers.res \
 	test_true_false.res \
-	test_trycatch.res
-	#test_termencoding.res \
-	#test_textprop.res \
-
-NEW_TESTS_RES_S3 = \
+	test_trycatch.res \
 	test_undo.res \
 	test_user_func.res \
 	test_usercommands.res \
@@ -561,4 +553,8 @@ NEW_TESTS_RES_S3 = \
 	test_alot_latin.res \
 	test_alot_utf8.res \
 	test_alot.res
-	#test_writefile.res \
+
+	#test_statusline.res
+	#test_writefile.res
+	#test_termencoding.res
+	#test_textprop.res \

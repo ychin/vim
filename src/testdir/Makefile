@@ -149,50 +149,50 @@ newtests: newtestssilent
 newtestssilent: $(NEW_TESTS_RES)
 
 #newtests_1: test_options.res test_scroll_opt.res
-newtests_1: $(NEW_TESTS_RES_S1)
+#newtests_1: $(NEW_TESTS_RES_S1)
 	#@/bin/sh -c "if test -f messages; then cat messages; fi"
 
 #newtests_2: test_cmdline.res test_options.res test_scroll_opt.res
-newtests_2: $(NEW_TESTS_RES_S2)
+#newtests_2: $(NEW_TESTS_RES_S2)
 	#@/bin/sh -c "if test -f messages; then cat messages; fi"
 
-newtests_3: $(NEW_TESTS_RES_S3)
-	@/bin/sh -c "if test -f messages; then cat messages; fi"
+#newtests_3: $(NEW_TESTS_RES_S3)
+#	@/bin/sh -c "if test -f messages; then cat messages; fi"
 
 make-new-tmux-session:
-	tmux kill-session 
+	tmux kill-session -t vimtest || true
 	tmux new-session -d -s vimtest
 
-newtests-split-1:
-	(cd ../..; rm -rf X_testdir1; mkdir X_testdir1; cp -R src X_testdir1; ln -s ../runtime X_testdir1)
-	$(MAKE) -j1 -C ../../X_testdir1/src/testdir VIMPROG=$(VIMPROG) GUI_FLAG=$(GUI_FLAG) SCRIPTSOURCE=$(SCRIPTSOURCE) clean nolog newtests_1
-
-newtests-split-2:
-	(cd ../..; rm -rf X_testdir2; mkdir X_testdir2; cp -R src X_testdir2; ln -s ../runtime X_testdir2)
-	$(MAKE) -j1 -C ../../X_testdir2/src/testdir VIMPROG=$(VIMPROG) GUI_FLAG=$(GUI_FLAG) SCRIPTSOURCE=$(SCRIPTSOURCE) clean nolog newtests_2
-
-# NOTE: Run this as the main entry point with `make -j`
-# Method 1: Clone the entire testdir, and then run a selection of tests in each.
-newtests-split-all: newtests-split-1 newtests-split-2
-	@# Don't do the +eval stuff since it's always there
-	@# Do i need to remove test.log here?
-	@/bin/sh -c "if test -f ../../X_testdir1/src/testdir/test.log; \
-		then cp ../../X_testdir1/src/testdir/test.log test.log; \
-		fi"
-	@/bin/sh -c "if test -f ../../X_testdir2/src/testdir/test.log; \
-		then cat ../../X_testdir2/src/testdir/test.log test.log >> test.log; \
-		fi"
-	@# Do i need to remove messages here?
-	cp ../../X_testdir1/src/testdir/messages messages
-	cat ../../X_testdir2/src/testdir/messages >> messages
-	$(VIMPROG) -u NONE $(NO_INITS) -S summarize.vim messages $(REDIR_TEST_TO_NULL)
-	@echo
-	@echo 'Test results:'
-	@cat test_result.log
-	@/bin/sh -c "if test -f test.log; \
-		then echo TEST FAILURE; exit 1; \
-		else echo ALL DONE; \
-		fi"
+#newtests-split-1:
+#	(cd ../..; rm -rf X_testdir1; mkdir X_testdir1; cp -R src X_testdir1; ln -s ../runtime X_testdir1)
+#	$(MAKE) -j1 -C ../../X_testdir1/src/testdir VIMPROG=$(VIMPROG) GUI_FLAG=$(GUI_FLAG) SCRIPTSOURCE=$(SCRIPTSOURCE) clean nolog newtests_1
+#
+#newtests-split-2:
+#	(cd ../..; rm -rf X_testdir2; mkdir X_testdir2; cp -R src X_testdir2; ln -s ../runtime X_testdir2)
+#	$(MAKE) -j1 -C ../../X_testdir2/src/testdir VIMPROG=$(VIMPROG) GUI_FLAG=$(GUI_FLAG) SCRIPTSOURCE=$(SCRIPTSOURCE) clean nolog newtests_2
+#
+## NOTE: Run this as the main entry point with `make -j`
+## Method 1: Clone the entire testdir, and then run a selection of tests in each.
+#newtests-split-all: newtests-split-1 newtests-split-2
+#	@# Don't do the +eval stuff since it's always there
+#	@# Do i need to remove test.log here?
+#	@/bin/sh -c "if test -f ../../X_testdir1/src/testdir/test.log; \
+#		then cp ../../X_testdir1/src/testdir/test.log test.log; \
+#		fi"
+#	@/bin/sh -c "if test -f ../../X_testdir2/src/testdir/test.log; \
+#		then cat ../../X_testdir2/src/testdir/test.log test.log >> test.log; \
+#		fi"
+#	@# Do i need to remove messages here?
+#	cp ../../X_testdir1/src/testdir/messages messages
+#	cat ../../X_testdir2/src/testdir/messages >> messages
+#	$(VIMPROG) -u NONE $(NO_INITS) -S summarize.vim messages $(REDIR_TEST_TO_NULL)
+#	@echo
+#	@echo 'Test results:'
+#	@cat test_result.log
+#	@/bin/sh -c "if test -f test.log; \
+#		then echo TEST FAILURE; exit 1; \
+#		else echo ALL DONE; \
+#		fi"
 
 # Method 2: Each test has its own virtualized folders with symlinks.
 make-template: clean
@@ -208,7 +208,7 @@ make-template: clean
 	@find `readlink -f .` -type d -mindepth 1 -maxdepth 1 -not -iname Xparallelfiles -exec ln -s {} Xparallelfiles/template/src/testdir \;
 	@find `readlink -f ..` -type f -maxdepth 1 -exec ln -s {} Xparallelfiles/template/src/ \;
 
-.vim.res.orig:
+old_vim_res_rules:
 	@echo "$(VIMPROG)" > vimcmd
 	@echo "$(RUN_VIMTEST)" >> vimcmd
 	$(RUN_VIMTEST) $(NO_INITS) -S runtest.vim $*.vim $(REDIR_TEST_TO_NULL)
@@ -241,17 +241,17 @@ make-template: clean
 	@# TODO ychin this doesn't work if the test failed. Detect that
 	@cp Xparallelfiles/$*/src/testdir/$*.res . || true
 
-test_gui.res: test_gui.vim
-	@echo "$(VIMPROG)" > vimcmd
-	@echo "$(RUN_GVIMTEST)" >> vimcmd
-	$(RUN_VIMTEST) -u NONE $(NO_INITS) -S runtest.vim $<
-	@rm vimcmd
-
-test_gui_init.res: test_gui_init.vim
-	@echo "$(VIMPROG)" > vimcmd
-	@echo "$(RUN_GVIMTEST_WITH_GVIMRC)" >> vimcmd
-	$(RUN_VIMTEST) -u gui_preinit.vim -U gui_init.vim $(NO_PLUGINS) -S runtest.vim $<
-	@rm vimcmd
+#test_gui.res: test_gui.vim
+#	@echo "$(VIMPROG)" > vimcmd
+#	@echo "$(RUN_GVIMTEST)" >> vimcmd
+#	$(RUN_VIMTEST) -u NONE $(NO_INITS) -S runtest.vim $<
+#	@rm vimcmd
+#
+#test_gui_init.res: test_gui_init.vim
+#	@echo "$(VIMPROG)" > vimcmd
+#	@echo "$(RUN_GVIMTEST_WITH_GVIMRC)" >> vimcmd
+#	$(RUN_VIMTEST) -u gui_preinit.vim -U gui_init.vim $(NO_PLUGINS) -S runtest.vim $<
+#	@rm vimcmd
 
 opt_test.vim: ../optiondefs.h gen_opt_test.vim
 	$(VIMPROG) -u NONE -S gen_opt_test.vim --noplugin --not-a-term ../optiondefs.h
