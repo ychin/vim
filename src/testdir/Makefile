@@ -208,13 +208,15 @@ make-template: clean
 	@find `readlink -f .` -type d -mindepth 1 -maxdepth 1 -not -iname Xparallelfiles -exec ln -s {} Xparallelfiles/template/src/testdir \;
 	@find `readlink -f ..` -type f -maxdepth 1 -exec ln -s {} Xparallelfiles/template/src/ \;
 
-old_vim_res_rules:
+#old_vim_res_rules:
+.vim.res:
 	@echo "$(VIMPROG)" > vimcmd
 	@echo "$(RUN_VIMTEST)" >> vimcmd
 	$(RUN_VIMTEST) $(NO_INITS) -S runtest.vim $*.vim $(REDIR_TEST_TO_NULL)
 	@rm vimcmd
 
-.vim.res:
+#.vim.res:
+new_vim_res_rules:
 	@rm -rf Xparallelfiles/$*
 	@# Much faster way to do this, require building a template folder first
 	@cp -R Xparallelfiles/template Xparallelfiles/$*

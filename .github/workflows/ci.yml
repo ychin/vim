@@ -259,7 +259,7 @@ jobs:
           cd src/testdir
           make make-template
           make make-new-tmux-session
-          do_test make -j5 newtestssilent
+          do_test make newtestssilent
           make report
           #do_test make ${SHADOWOPT} ${TEST}
 
@@ -365,7 +365,7 @@ jobs:
           cd src/testdir
           make make-template
           make make-new-tmux-session
-          make -j6 newtestssilent
+          make newtestssilent
           make report
 
 
