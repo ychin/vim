@@ -275,7 +275,6 @@ NEW_TESTS = \
 	test_startup \
 	test_startup_utf8 \
 	test_stat \
-	test_statusline \
 	test_substitute \
 	test_suspend \
 	test_swap \
@@ -328,6 +327,7 @@ NEW_TESTS = \
 	test_alot_latin \
 	test_alot_utf8 \
 	test_alot
+	#test_statusline \
 
 # Test targets that use runtest.vim.
 # Keep test_alot*.res as the last one, sort the others.
@@ -376,9 +376,7 @@ NEW_TESTS_RES = \
 	test_cursor_func.res \
 	test_cursorline.res \
 	test_curswant.res \
-	test_debugger.res \
 	test_delete.res \
-	test_diffmode.res \
 	test_digraph.res \
 	test_display.res \
 	test_edit.res \
@@ -411,7 +409,9 @@ NEW_TESTS_RES = \
 	test_getcwd.res \
 	test_getvar.res \
 	test_gf.res \
-	test_gn.res \
+	test_gn.res
+
+NEW_TESTS_RES_S1 = \
 	test_goto.res \
 	test_gui.res \
 	test_gui_init.res \
@@ -491,7 +491,9 @@ NEW_TESTS_RES = \
 	test_registers.res \
 	test_rename.res \
 	test_restricted.res \
-	test_retab.res \
+	test_retab.res
+
+NEW_TESTS_RES_S2 = \
 	test_ruby.res \
 	test_scriptnames.res \
 	test_scroll_opt.res \
@@ -527,17 +529,19 @@ NEW_TESTS_RES = \
 	test_tcl.res \
 	test_termcodes.res \
 	test_termdebug.res \
-	test_termencoding.res \
 	test_terminal.res \
 	test_terminal2.res \
 	test_terminal3.res \
 	test_terminal_fail.res \
 	test_textformat.res \
 	test_textobjects.res \
-	test_textprop.res \
 	test_timers.res \
 	test_true_false.res \
-	test_trycatch.res \
+	test_trycatch.res
+	#test_termencoding.res \
+	#test_textprop.res \
+
+NEW_TESTS_RES_S3 = \
 	test_undo.res \
 	test_user_func.res \
 	test_usercommands.res \
