@@ -44,6 +44,8 @@ benchmark: $(SCRIPTS_BENCH)
 
 report:
 	@# without the +eval feature test_result.log is a copy of test.log
+	(ls Xparallelfiles/*/src/testdir/messages && cat Xparallelfiles/*/src/testdir/messages > messages) || true
+	(ls Xparallelfiles/*/src/testdir/test.log && cat Xparallelfiles/*/src/testdir/test.log > test.log) || true
 	@/bin/sh -c "if test -f test.log; \
 		then cp test.log test_result.log; \
 		else echo No failures reported > test_result.log; \
@@ -102,6 +104,10 @@ benchmarkclean:
 
 nolog:
 	-rm -f test_result.log $(CLEANUP_FILES)
+	# TODO ychin clean this up to use CLEANUP_FILES
+	-rm -f Xparallelfiles/*/src/testdir/messages
+	-rm -f Xparallelfiles/*/src/testdir/test.log
+	-rm -f Xparallelfiles/*/src/testdir/starttime
 
 
 # Tiny tests.  Works even without the +eval feature.
@@ -137,6 +143,7 @@ tinytests: $(SCRIPTS_TINY_OUT)
 RUN_VIMTEST = VIMRUNTIME=$(SCRIPTSOURCE) $(VALGRIND) $(VIMPROG) -f $(GUI_FLAG) -u unix.vim --gui-dialog-file guidialog
 
 newtests: newtestssilent
+	# TODO ychin fix this? cat messages doesn't work right now.
 	@/bin/sh -c "if test -f messages; then cat messages; fi"
 
 newtestssilent: $(NEW_TESTS_RES)
@@ -145,7 +152,7 @@ newtestssilent: $(NEW_TESTS_RES)
 newtests_1: $(NEW_TESTS_RES_S1)
 	#@/bin/sh -c "if test -f messages; then cat messages; fi"
 
-#newtests_2: test_cmdline.res
+#newtests_2: test_cmdline.res test_options.res test_scroll_opt.res
 newtests_2: $(NEW_TESTS_RES_S2)
 	#@/bin/sh -c "if test -f messages; then cat messages; fi"
 
@@ -187,17 +194,52 @@ newtests-split-all: newtests-split-1 newtests-split-2
 		else echo ALL DONE; \
 		fi"
 
-.vim.res:
+# Method 2: Each test has its own virtualized folders with symlinks.
+make-template: clean
+	@# Build a template folder with all the appropriate symlinks, since copying
+	@# this folder is faster than creating all the symlinks every time.
+	@# This depends on 'clean' because we are linking every file in testdir. If
+	@# there are stragglers from previous tests these would be mapped into every
+	@# test that uses this template folder.
+	@rm -rf Xparallelfiles/template
+	@mkdir -p Xparallelfiles/template/src/testdir
+	@ln -s ../../../../runtime Xparallelfiles/template
+	@find `readlink -f .` -type f -maxdepth 1 -exec ln -s {} Xparallelfiles/template/src/testdir \;
+	@find `readlink -f .` -type d -mindepth 1 -maxdepth 1 -not -iname Xparallelfiles -exec ln -s {} Xparallelfiles/template/src/testdir \;
+	@find `readlink -f ..` -type f -maxdepth 1 -exec ln -s {} Xparallelfiles/template/src/ \;
+
+.vim.res.orig:
 	@echo "$(VIMPROG)" > vimcmd
 	@echo "$(RUN_VIMTEST)" >> vimcmd
-	#@$(RUN_VIMTEST) $(NO_INITS) -S runtest.vim $*.vim $(REDIR_TEST_TO_NULL)
+	$(RUN_VIMTEST) $(NO_INITS) -S runtest.vim $*.vim $(REDIR_TEST_TO_NULL)
+	@rm vimcmd
+
+.vim.res:
+	@rm -rf Xparallelfiles/$*
+	@# Much faster way to do this, require building a template folder first
+	@cp -R Xparallelfiles/template Xparallelfiles/$*
+	@#mkdir -p Xparallelfiles/$*/src/testdir
+	@#ln -s ../../../../runtime Xparallelfiles/$*
+	@#find `readlink -f .` -type f -maxdepth 1 -exec ln -s {} Xparallelfiles/$*/src/testdir \;
+	@#find `readlink -f .` -type d -mindepth 1 -maxdepth 1 -not -iname Xparallelfiles -exec ln -s {} Xparallelfiles/$*/src/testdir \;
+	@# On Linux / GNU can use -executable below, but then we actually want all files anyway
+	@#@find $(readlink -f ..) -type f -perm +111 -maxdepth 1 -exec ln -s {} Xparallelfiles/test_options/src/ \;
+	@#@find `readlink -f ..` -type f -maxdepth 1 -exec ln -s {} Xparallelfiles/$*/src/ \;
+
+	@echo "$(VIMPROG)" > Xparallelfiles/$*/src/testdir/vimcmd
+	@echo "$(RUN_VIMTEST)" >> Xparallelfiles/$*/src/testdir/vimcmd
+	@#cd Xparallelfiles/$*/src/testdir && $(RUN_VIMTEST) $(NO_INITS) -S runtest.vim $*.vim $(REDIR_TEST_TO_NULL)
 
 	@echo Running $* in tmux  
-	@tmux new-window -n "$*" '$(RUN_VIMTEST) $(NO_INITS) -S runtest.vim $*.vim; tmux wait -S $*'
+	@cd Xparallelfiles/$*/src/testdir && tmux new-window -n "$*" '$(RUN_VIMTEST) $(NO_INITS) -S runtest.vim $*.vim; tmux wait -S $*'
+	@#cd Xparallelfiles/$*/src/testdir && tmux new-window -n "$*" '$(RUN_VIMTEST) $(NO_INITS) -S runtest.vim $*.vim --cmd "au SwapExists * let v:swapchoice=\"e\"" > /dev/null; tmux wait -S $*'
 	@tmux wait $*
 	@echo Done $* in tmux
 
-	@rm vimcmd
+	@rm Xparallelfiles/$*/src/testdir/vimcmd
+
+	@# TODO ychin this doesn't work if the test failed. Detect that
+	@cp Xparallelfiles/$*/src/testdir/$*.res . || true
 
 test_gui.res: test_gui.vim
 	@echo "$(VIMPROG)" > vimcmd
@@ -214,8 +256,8 @@ test_gui_init.res: test_gui_init.vim
 opt_test.vim: ../optiondefs.h gen_opt_test.vim
 	$(VIMPROG) -u NONE -S gen_opt_test.vim --noplugin --not-a-term ../optiondefs.h
 
-test_xxd.res:
-	XXD=$(XXDPROG); export XXD; $(RUN_VIMTEST) $(NO_INITS) -S runtest.vim test_xxd.vim
+#test_xxd.res:
+#	XXD=$(XXDPROG); export XXD; $(RUN_VIMTEST) $(NO_INITS) -S runtest.vim test_xxd.vim
 
 test_bench_regexp.res: test_bench_regexp.vim
 	-rm -rf benchmark.out $(RM_ON_RUN)

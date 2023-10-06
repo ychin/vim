@@ -158,7 +158,9 @@ func Test_nonexistent_file()
 endfunc
 
 func Test_getftype()
-  call assert_equal('file', getftype(v:progpath))
+  defer delete('Xstatdummy')
+  call writefile([], 'Xstatdummy')
+  call assert_equal('file', getftype('Xstatdummy'))
   call assert_equal('dir',  getftype('.'))
 
   if !has('unix')

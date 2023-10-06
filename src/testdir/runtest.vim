@@ -177,7 +177,7 @@ call test_override('alloc_lines', 1)
 
 " Support function: get the alloc ID by name.
 function GetAllocId(name)
-  exe 'split ' . s:srcdir . '/alloc.h'
+  noswapfile exe 'split ' . s:srcdir . '/alloc.h'
   let top = search('typedef enum')
   if top == 0
     call add(v:errors, 'typedef not found in alloc.h')

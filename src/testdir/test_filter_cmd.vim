@@ -191,8 +191,8 @@ func Test_filter_display()
 endfunc
 
 func Test_filter_scriptnames()
-  let lines = split(execute('filter /test_filter_cmd/ scriptnames'), "\n")
-  call assert_equal(1, len(lines))
+  let lines = split(execute('filter /test_filter_cmd.vim/ scriptnames'), "\n")
+  call assert_equal(1, len(lines), lines)
   call assert_match('filter_cmd', lines[0])
 endfunc
 

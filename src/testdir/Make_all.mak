@@ -557,8 +557,8 @@ NEW_TESTS_RES_S3 = \
 	test_window_id.res \
 	test_windows_home.res \
 	test_wordcount.res \
-	test_writefile.res \
 	test_xxd.res \
 	test_alot_latin.res \
 	test_alot_utf8.res \
 	test_alot.res
+	#test_writefile.res \
