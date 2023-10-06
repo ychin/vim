@@ -362,6 +362,10 @@ jobs:
         timeout-minutes: 20
         run: |
           #make ${TEST}
+          echo "Diff where"
+          which diff
+          echo "Diff ver"
+          diff --version
           cd src/testdir
           make make-template
           make make-new-tmux-session
