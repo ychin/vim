@@ -545,6 +545,13 @@ NEW_TESTS_RES = \
 	test_xxd.res \
 	test_alot_latin.res \
 	test_alot_utf8.res \
+	test_messages.res \
+	test_visual.res \
+	test_termdebug.res \
+	test_statusline.res \
+	test_writefile.res \
+	test_termencoding.res \
+	test_textprop.res \
 	test_alot.res
 
 # These are failing in CI, not sure why
