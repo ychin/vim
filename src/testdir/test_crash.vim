@@ -8,11 +8,20 @@ func Test_crash1()
   CheckNotBSD
   CheckExecutable dash
   " Test 7 fails on Mac ...
-  CheckNotMac
+  " TODO ychin wtf? just enable this
+  "CheckNotMac
+  " TODO ychin does Tapi work on Windows?
+  " - If Tapi does not work. Maybe just closing the terminal and launch a new
+  "   one is easiest.
 
   " The following used to crash Vim
   let opts = #{cmd: 'sh'}
   let vim  = GetVimProg()
+
+    let g:run_complete = 0
+  func! Tapi_runcomplete(bufnum, arglist)
+    let g:run_complete = 1
+  endfunc
 
   let buf = RunVimInTerminal('sh', opts)
 
@@ -21,19 +30,25 @@ func Test_crash1()
   let args = printf(cmn_args, vim, file)
   call term_sendkeys(buf, args ..
     \ '  && echo "crash 1: [OK]" > X_crash1_result.txt' .. "\<cr>")
-  call TermWait(buf, 50)
+  call term_sendkeys(buf, 'printf ''\033]51;["call", "Tapi_runcomplete", []]\007''' .. "\<cr>")
+  call WaitFor({-> g:run_complete == 1 }, 5000)
+  let g:run_complete = 0
 
   let file = 'crash/poc_huaf2'
   let args = printf(cmn_args, vim, file)
   call term_sendkeys(buf, args ..
     \ '  && echo "crash 2: [OK]" >> X_crash1_result.txt' .. "\<cr>")
-  call TermWait(buf, 50)
+  call term_sendkeys(buf, 'printf ''\033]51;["call", "Tapi_runcomplete", []]\007''' .. "\<cr>")
+  call WaitFor({-> g:run_complete == 1 }, 5000)
+  let g:run_complete = 0
 
   let file = 'crash/poc_huaf3'
   let args = printf(cmn_args, vim, file)
   call term_sendkeys(buf, args ..
     \ '  && echo "crash 3: [OK]" >> X_crash1_result.txt' .. "\<cr>")
-  call TermWait(buf, 100)
+  call term_sendkeys(buf, 'printf ''\033]51;["call", "Tapi_runcomplete", []]\007''' .. "\<cr>")
+  call WaitFor({-> g:run_complete == 1 }, 5000)
+  let g:run_complete = 0
 
   let file = 'crash/bt_quickfix_poc'
   let args = printf(cmn_args, vim, file)
@@ -42,7 +57,9 @@ func Test_crash1()
   " clean up
   call delete('Xerr')
   " This test takes a bit longer
-  call TermWait(buf, 1000)
+  call term_sendkeys(buf, 'printf ''\033]51;["call", "Tapi_runcomplete", []]\007''' .. "\<cr>")
+  call WaitFor({-> g:run_complete == 1 }, 5000)
+  let g:run_complete = 0
 
   let file = 'crash/poc_tagfunc.vim'
   let args = printf(cmn_args, vim, file)
@@ -50,7 +67,9 @@ func Test_crash1()
   call term_sendkeys(buf, args ..
     \ '  || echo "crash 5: [OK]" >> X_crash1_result.txt' .. "\<cr>")
 
-  call TermWait(buf, 100)
+  call term_sendkeys(buf, 'printf ''\033]51;["call", "Tapi_runcomplete", []]\007''' .. "\<cr>")
+  call WaitFor({-> g:run_complete == 1 }, 5000)
+  let g:run_complete = 0
 
   let file = 'crash/bt_quickfix1_poc'
   let args = printf(cmn_args, vim, file)
@@ -58,31 +77,41 @@ func Test_crash1()
     \ '  && echo "crash 6: [OK]" >> X_crash1_result.txt' .. "\<cr>")
   " clean up
   call delete('X')
-  call TermWait(buf, 3000)
+  call term_sendkeys(buf, 'printf ''\033]51;["call", "Tapi_runcomplete", []]\007''' .. "\<cr>")
+  call WaitFor({-> g:run_complete == 1 }, 5000)
+  let g:run_complete = 0
 
   let file = 'crash/vim_regsub_both_poc'
   let args = printf(cmn_args, vim, file)
   call term_sendkeys(buf, args ..
     \ '  && echo "crash 7: [OK]" >> X_crash1_result.txt' .. "\<cr>")
-  call TermWait(buf, 3000)
+  call term_sendkeys(buf, 'printf ''\033]51;["call", "Tapi_runcomplete", []]\007''' .. "\<cr>")
+  call WaitFor({-> g:run_complete == 1 }, 5000)
+  let g:run_complete = 0
 
   let file = 'crash/vim_msg_trunc_poc'
   let args = printf(cmn_args, vim, file)
   call term_sendkeys(buf, args ..
     \ '  || echo "crash 8: [OK]" >> X_crash1_result.txt' .. "\<cr>")
-  call TermWait(buf, 3000)
+  call term_sendkeys(buf, 'printf ''\033]51;["call", "Tapi_runcomplete", []]\007''' .. "\<cr>")
+  call WaitFor({-> g:run_complete == 1 }, 5000)
+  let g:run_complete = 0
 
   let file = 'crash/crash_scrollbar'
   let args = printf(cmn_args, vim, file)
   call term_sendkeys(buf, args ..
     \ '  && echo "crash 9: [OK]" >> X_crash1_result.txt' .. "\<cr>")
-  call TermWait(buf, 1000)
+  call term_sendkeys(buf, 'printf ''\033]51;["call", "Tapi_runcomplete", []]\007''' .. "\<cr>")
+  call WaitFor({-> g:run_complete == 1 }, 5000)
+  let g:run_complete = 0
 
   let file = 'crash/editing_arg_idx_POC_1'
   let args = printf(cmn_args, vim, file)
   call term_sendkeys(buf, args ..
     \ '  || echo "crash 10: [OK]" >> X_crash1_result.txt' .. "\<cr>")
-  call TermWait(buf, 1000)
+  call term_sendkeys(buf, 'printf ''\033]51;["call", "Tapi_runcomplete", []]\007''' .. "\<cr>")
+  call WaitFor({-> g:run_complete == 1 }, 5000)
+  let g:run_complete = 0
   call delete('Xerr')
   call delete('@')
 
