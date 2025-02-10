@@ -145,13 +145,13 @@ def Test_timer_stopall_with_popup()
   # Another timer will fire in half a second and close it early after stopping
   # all timers.
   var pop = popup_create('Popup', {time: 10000})
-  var tmr = timer_start(500, (_) => {
+  var tmr = timer_start(100, (_) => {
     timer_stopall()
     popup_clear()
   })
-  sleep 1
+  sleep 100m
+  g:WaitForAssert(() => assert_equal([], popup_list()), 1000)
   assert_equal([], timer_info(tmr))
-  assert_equal([], popup_list())
 enddef
 
 func Test_timer_paused()
