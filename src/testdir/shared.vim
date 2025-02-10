@@ -200,12 +200,12 @@ func s:WaitForCommon(expr, assert, timeout)
       call remove(v:errors, -1)
     endif
 
-    " TODO ychin This needs to be fixed up
-    sleep 10m
+    " TODO ychin experimental here, reduce time from 10m to 1m
+    sleep 1m
     if exists('*reltimefloat')
       let slept = float2nr(reltimefloat(reltime(start)) * 1000)
     else
-      let slept += 10
+      let slept += 1
     endif
   endwhile
 

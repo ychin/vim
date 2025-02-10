@@ -62,7 +62,8 @@ func VerifyScreenDump(buf, filename, options, ...)
   let g:giveup_same_error = 0
 
   " wait for the pending updates to be handled.
-  call TermWait(a:buf)
+  "call TermWait(a:buf)
+  call TermWait(a:buf, 0)
 
   " Redraw to execute the code that updates the screen.  Otherwise we get the
   " text and attributes only from the internal buffer.
@@ -84,7 +85,8 @@ func VerifyScreenDump(buf, filename, options, ...)
   let i = 0
   while 1
     " leave some time for updating the original window
-    sleep 50m
+    "sleep 50m
+    sleep 1m
     call delete(testfile)
     call term_dumpwrite(a:buf, testfile, a:options)
 
