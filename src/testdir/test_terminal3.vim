@@ -238,6 +238,7 @@ func Test_terminal_color_gui_transp_wincolor()
 endfunc
 
 func Test_terminal_in_popup()
+  " TODO ychin this is terrible and manual timing. Fuck this shit and fix this.
   CheckRunVimInTerminal
 
   let text =<< trim END

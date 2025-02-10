@@ -48,10 +48,13 @@ enddef
 " message.  Use this when using the same dump file with different options.
 " Returns non-zero when verification fails.
 func VerifyScreenDump(buf, filename, options, ...)
+    " TODO ychin this function is horribly inefficient
+    " Both TermWait() and the sleep 50m are terrible
   let reference = 'dumps/' . a:filename . '.dump'
   let filter = 'dumps/' . a:filename . '.vim'
   let testfile = 'failed/' . a:filename . '.dump'
 
+  " TODO ychin do i need to tune max_loops?
   let max_loops = get(a:options, 'wait', 1000) / 10
 
   " Starting a terminal to make a screendump is always considered flaky.

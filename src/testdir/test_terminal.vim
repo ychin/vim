@@ -52,6 +52,7 @@ func Test_terminal_no_name()
 endfunc
 
 func Test_terminal_TerminalWinOpen()
+  " TODO ychin look into this
   au TerminalWinOpen * let b:done = 'yes'
   let buf = Run_shell_in_terminal({})
   call assert_equal('yes', b:done)
@@ -692,6 +693,7 @@ func Test_terminal_curwin()
 endfunc
 
 func s:get_sleep_cmd()
+  " TODO ychin look into this. These slow sleep hurts me
   if s:python != ''
     let cmd = s:python . " test_short_sleep.py"
     " 500 was not enough for Travis
@@ -709,6 +711,7 @@ func s:get_sleep_cmd()
 endfunc
 
 func Test_terminal_finish_open_close()
+  " TODO ychin look into this
   call assert_equal(1, winnr('$'))
 
   let [cmd, waittime] = s:get_sleep_cmd()
@@ -1764,6 +1767,7 @@ func Test_terminal_statusline()
   set statusline=x
   terminal
   let tbuf = bufnr('')
+  " TODO ychin this should be purged with prejudice
   call term_sendkeys(tbuf, "clear; echo a; echo b; sleep 1; clear\n")
   call timer_start(500, { tid -> feedkeys("\<C-w>j", 'tx') })
   call timer_start(1500, { tid -> feedkeys("\<C-l>", 'tx') })

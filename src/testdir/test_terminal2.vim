@@ -266,6 +266,7 @@ func Test_termwinscroll_topline()
 
   let num2 = &termwinscroll / 100 * 10
   call writefile(range(num2), 'Xtext', 'D')
+  " TODO ychin wtf these lines are useless. WTF are they doing?
   if has('win32')
     call term_sendkeys(buf, "timeout /t 1 && type Xtext\<CR>")
   else
@@ -313,14 +314,15 @@ func Test_termwinscroll_topline2()
   call term_sendkeys(buf, 'printf ''\033]51;["call", "Tapi_print_complete", []]\007''' .. "\<cr>")
   let rows = term_getsize(buf)[0]
   let cnt = 0
-  while !g:print_complete && cnt <= 1000
+  while !g:print_complete && cnt <= 10000
+    " TODO ychin refactor this to be easier to use
     " max number of runs
     let cnt += 1
     " sleep a bit, to give the the terminal some time to finish
 
     " It may take a while to finish on a slow system
     " so wait a bit and handle the callback
-    call term_wait(buf)
+    call term_wait(buf, 0)
   endwhile
   call WaitForAssert({-> assert_match(string(num1 - 1), term_getline(buf, rows - 1) .. '\|' .. term_getline(buf, rows - 2))})
   call feedkeys("\<C-W>N", 'xt')

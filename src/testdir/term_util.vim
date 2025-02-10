@@ -151,6 +151,7 @@ endfunc
 
 " Stop a Vim running in terminal buffer "buf".
 func StopVimInTerminal(buf, kill = 1)
+  " TODO ychin this is also slow since it's using TermWait
   " Using a terminal to run Vim is always considered flaky.
   let g:test_is_flaky = 1
 
