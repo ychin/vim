@@ -238,7 +238,7 @@ func Test_terminal_color_gui_transp_wincolor()
 endfunc
 
 func Test_terminal_in_popup()
-  " TODO ychin this is terrible and manual timing. Fuck this shit and fix this.
+  " TODO ychin this is terrible and manual timing. Fuck this shit and confirm that I fixed this.
   CheckRunVimInTerminal
 
   let text =<< trim END
@@ -271,11 +271,11 @@ func Test_terminal_in_popup()
 	\ ]
   call writefile(lines, 'XtermPopup', 'D')
   let buf = RunVimInTerminal('-S XtermPopup', #{rows: 15})
-  call TermWait(buf, 200)
+  call TermWait(buf,0)
   call term_sendkeys(buf, ":call OpenTerm(0)\<CR>")
-  call TermWait(buf, 800)
+  call TermWait(buf,0)
   call term_sendkeys(buf, ":\<CR>")
-  call TermWait(buf, 500)
+  call TermWait(buf,0)
   call term_sendkeys(buf, "\<C-W>:echo getwinvar(g:winid, \"&buftype\") win_gettype(g:winid)\<CR>")
   call VerifyScreenDump(buf, 'Test_terminal_popup_1', {})
 
@@ -283,16 +283,16 @@ func Test_terminal_in_popup()
   call VerifyScreenDump(buf, 'Test_terminal_popup_2', {})
  
   call term_sendkeys(buf, ":call OpenTerm(1)\<CR>")
-  call TermWait(buf, 800)
+  call TermWait(buf,0)
   call term_sendkeys(buf, ":set hlsearch\<CR>")
-  call TermWait(buf, 500)
+  call TermWait(buf,0)
   call term_sendkeys(buf, "/edit\<CR>")
   call VerifyScreenDump(buf, 'Test_terminal_popup_3', {})
  
   call term_sendkeys(buf, "\<C-W>:call HidePopup()\<CR>")
   call VerifyScreenDump(buf, 'Test_terminal_popup_4', {})
   call term_sendkeys(buf, "\<CR>")
-  call TermWait(buf, 50)
+  call TermWait(buf,0)
 
   call term_sendkeys(buf, "\<C-W>:call ClosePopup()\<CR>")
   call VerifyScreenDump(buf, 'Test_terminal_popup_5', {})
@@ -308,9 +308,9 @@ func Test_terminal_in_popup()
   call term_sendkeys(buf, "A")
   call VerifyScreenDump(buf, 'Test_terminal_popup_8', {})
 
-  call TermWait(buf, 50)
+  call TermWait(buf,0)
   call term_sendkeys(buf, ":q\<CR>")
-  call TermWait(buf, 250)  " wait for terminal to vanish
+  call WaitForAssert({-> assert_equal(0, match(term_getline(buf, 6), '^5\s*$'))}, 250) " wait for terminal to vanish
 
   call StopVimInTerminal(buf)
 endfunc
