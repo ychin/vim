@@ -291,8 +291,6 @@ func Test_termwinscroll_topline()
 endfunc
 
 func Test_termwinscroll_topline2()
-  " calling the terminal API doesn't work on Windows
-  CheckNotMSWindows
   let g:test_is_flaky = 1
   let g:print_complete = 0
   func! Tapi_print_complete(bufnum, arglist)
