@@ -44,10 +44,12 @@ func Test_timer_repeat_three()
   let slept = WaitFor('g:val == 3')
   call assert_equal(3, g:val)
   if has('reltime')
+    " Timer has an internal 1ms allowance in calculating due time, so it's
+    " possible for each timer to undershoot by 1ms resulting in only 49*3=147
+    " ms elapsed. Additionally we started the timer before we called
+    " WaitFor(), so the reported time could be a couple more ms below 147.
     if has('mac')
-      " Mac on Travis can be slow.
-      " TODO ychin think about this more. This is a little unpredictable how
-      " much it undershoots due to timing logic.
+      " Mac in CI can be slow.
       call assert_inrange(145, 400, slept)
     else
       call assert_inrange(145, 250, slept)
