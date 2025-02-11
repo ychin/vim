@@ -36,8 +36,7 @@ func Test_balloon_eval_term()
   call TermWait(buf, 50)
   call term_sendkeys(buf, 'll')
   call term_sendkeys(buf, ":call Trigger()\<CR>")
-  " TODO ychin this seems subpar. See if I could get around it
-  sleep 250m " Wait for balloon to show up (100ms balloondelay time)
+  sleep 150m " Wait for balloon to show up (100ms balloondelay time)
   call VerifyScreenDump(buf, 'Test_balloon_eval_term_01', {})
 
   " Make sure the balloon still shows after 'updatetime' passed and CursorHold

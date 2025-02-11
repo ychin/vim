@@ -2420,8 +2420,6 @@ endfunc
 " Test for using a popup menu for the command line completion matches
 " (wildoptions=pum)
 func Test_wildmenu_pum()
-  " TODO ychin this is *SLOW*. Investigate why. I imagine VerifyScreenDump is
-  " a culprit
   CheckRunVimInTerminal
 
   let commands =<< trim [CODE]

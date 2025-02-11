@@ -151,7 +151,6 @@ endfunc
 
 " Stop a Vim running in terminal buffer "buf".
 func StopVimInTerminal(buf, kill = 1)
-  " TODO ychin this is also slow since it's using TermWait
   " Using a terminal to run Vim is always considered flaky.
   let g:test_is_flaky = 1
 
@@ -165,7 +164,6 @@ func StopVimInTerminal(buf, kill = 1)
   call term_sendkeys(a:buf, "\<C-O>:\<C-U>qa!\<cr>")
 
   " Wait for all the pending updates to terminal to complete
-  "call TermWait(a:buf)
   call TermWait(a:buf, 1)
 
   " Wait for the terminal to end.
