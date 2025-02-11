@@ -200,7 +200,6 @@ func s:WaitForCommon(expr, assert, timeout)
       call remove(v:errors, -1)
     endif
 
-    " TODO ychin experimental here, reduce time from 10m to 1m
     sleep 1m
     if exists('*reltimefloat')
       let slept = float2nr(reltimefloat(reltime(start)) * 1000)
