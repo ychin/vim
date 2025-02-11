@@ -266,7 +266,6 @@ func Test_termwinscroll_topline()
 
   let num2 = &termwinscroll / 100 * 10
   call writefile(range(num2), 'Xtext', 'D')
-  " TODO ychin wtf these lines are useless. WTF are they doing?
   if has('win32')
     call term_sendkeys(buf, "timeout /t 1 && type Xtext\<CR>")
   else
